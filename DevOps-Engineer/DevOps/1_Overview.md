@@ -1,6 +1,8 @@
 # Overview of DevOps
 
+```
 Technology enables innovation, but strong business ideas drive it.
+```
 
 ## What is DevOps?
 
