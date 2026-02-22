@@ -1,9 +1,12 @@
-1. Codebase
+# 12-Factor Application Methodology
 
-Use Git to track your codebase, and have a single codebase per app/service.
-Multiple deploys from the same codebase are allowed (e.g., staging and production), but there should be a one-to-one relationship between codebase and app/service. 
-Each codebase should be tracked in a revision control system, such as Git, Mercurial, or Subversion.
-Central Repositories that support storing codebases are Github, Gitlab, Bitbucket, and Azure Repos.
+## 1. Codebase
+
+Use **Git** to track your codebase, and have a **single codebase per app/service**.
+
+- Multiple deploys from the same codebase are allowed (e.g., staging and production), but there should be a one-to-one relationship between codebase and app/service.
+- Each codebase should be tracked in a revision control system, such as Git, Mercurial, or Subversion.
+- Central repositories that support storing codebases: Github, Gitlab, Bitbucket, and Azure Repos.
 
 Example Git commands:
 ```bash
@@ -23,11 +26,17 @@ git push -u origin master
 
 Or using Git GUI tools like GitHub Desktop, GitKraken, SourceTree or Git Graph Extension on VS Code can also help to manage the codebase visually.
 
-2. Dependencies
+## 2. Dependencies
 
-Don't rely on implicit existence of system-wide packages. Declare all dependencies explicitly in a manifest file (e.g., `requirements.txt` for Python, `package.json` for Node.js, `Gemfile` for Ruby). Use a dependency manager to handle the installation and versioning of these dependencies.
+**Don't rely on implicit existence of system-wide packages.** Declare all dependencies explicitly in a manifest file:
 
-Version control (by version numbers) and isolation (using virtual environments, such as `venv` for Python or containers, such as Docker) are crucial to ensure that the app runs consistently across different environments.
+- `requirements.txt` for Python
+- `package.json` for Node.js
+- `Gemfile` for Ruby
+
+Use a **dependency manager** to handle the installation and versioning of these dependencies.
+
+**Version control** (by version numbers) and **isolation** (using virtual environments like `venv` for Python or containers like Docker) are crucial to ensure consistent app execution across environments.
 
 Example Dockerfile for a Python application:
 ```Dockerfile
@@ -59,13 +68,20 @@ docker build -t my-python-app .
 docker run -d -p 5000:5000 my-python-app
 ```
 
-3. Config
+## 3. Config
 
-Configuration refers to the settings and parameters that determine how an app behaves in different environments. These settings should be stored in environment variables (e.g., `.env` files or k8s ConfigMaps) or configuration files, rather than being hardcoded into the app's code. This allows for greater flexibility and easier management of different environments (e.g., development, staging, production).
+**Configuration** refers to the settings and parameters that determine how an app behaves in different environments.
 
-4. Backing Services
+- Store settings in **environment variables** (e.g., `.env` files or k8s ConfigMaps) or configuration files, rather than hardcoding into the app's code.
+- This allows for greater flexibility and easier management of different environments (development, staging, production).
 
-Backing services are any services that the app consumes over the network as part of its normal operation. Examples include databases, message queues, caching systems, and external APIs. These services should be treated as attached resources, meaning they can be swapped out without requiring changes to the app's code. The app should be designed to connect to these services using configuration, such as environment variables, rather than hardcoding connection details.
+## 4. Backing Services
+
+**Backing services** are any services that the app consumes over the network as part of its normal operation.
+
+- Examples: databases, message queues, caching systems, external APIs
+- Treat services as **attached resources** that can be swapped out without requiring code changes.
+- Connect using **configuration** (e.g., environment variables) rather than hardcoding connection details.
 
 Example of Backing Services:
 - **Database**: PostgreSQL, MySQL, MongoDB
@@ -80,50 +96,65 @@ Clear separation between the build, release, and run stages of the app's lifecyc
 - **Release stage**: Combining the build artifact with the configuration to create a release that can be deployed to production (e.g., using a CI/CD pipeline, Docker Container + .env files). Each release should be uniquely identifiable (e.g., by a version number or a Git commit hash) and should be immutable, meaning that once a release is created, it cannot be modified. This way it can be easily rolled back to a previous release if needed.
 - **Run stage**: Executing the app in the defined environment (dev, staging, production with its own environment variables).
 
-6. Processes
+## 6. Processes
 
-**Stateless processes**: The app should be designed to be stateless, meaning that any instance of the app can handle any request without relying on previous interactions. This allows for better scalability and resilience, as any instance can be replaced or scaled up/down without affecting the overall functionality of the app.
+### Stateless Processes
 
-Stateful data should be stored in a backing service, such as a database or a cache, which can be accessed by any instance of the app.
+- Design the app to be **stateless**, so any instance can handle any request without relying on previous interactions.
+- This enables better **scalability and resilience**, as any instance can be replaced or scaled without affecting functionality.
+- **Stateful data** should be stored in a backing service (database, cache) accessible by any app instance.
 
-7. Port Binding
+## 7. Port Binding
 
-The app should be self-contained and should not rely on any external web server to run. Instead, it should bind to a specific port and listen for incoming requests. This allows the app to be easily deployed and scaled, as it can run in any environment that supports the required runtime (e.g., a container, a virtual machine, or a serverless platform).
+The app should be **self-contained** and should not rely on any external web server to run.
 
-8. Concurrency
+- Bind to a specific port and listen for incoming requests.
+- This enables easy deployment and scaling in any environment supporting the required runtime (container, virtual machine, serverless platform).
 
-Each instance of the app can serve multiple requests. On high influx of requests, we can scale up by increasing resources (vertical scaling), this might require restarting the app and causing downtime, or by running multiple instances of the app (horizontal scaling).
+## 8. Concurrency
 
-For horizontal scaling, it is required to have a load balancer to distribute incoming traffic across multiple instances of the app. This can be achieved using tools like Nginx, HAProxy, or cloud-based load balancers provided by AWS, Azure, or Google Cloud. Horizontal scaling requires the app to be **stateless**, meaning that any instance of the app can handle any request without relying on previous interactions.
+Each instance of the app can serve multiple requests. On high influx of requests, scale up by:
 
-9. Disposability
+- **Vertical scaling**: Increase resources (may require restart and cause downtime)
+- **Horizontal scaling**: Run multiple app instances
 
-The app should be designed to start up and shut down quickly, allowing for rapid scaling and deployment. This means that processes should be disposable, meaning they can be started or stopped at any time without affecting the overall functionality of the app. This also allows for easier recovery from failures, as any instance of the app can be replaced without impacting the system.
+**Horizontal scaling** requires:
+- A **load balancer** to distribute traffic across instances (e.g., Nginx, HAProxy, AWS/Azure/Google Cloud load balancers)
+- **Stateless** app design so any instance can handle any request without relying on previous interactions
 
-For example, `docker stop ...` will send a SIGTERM signal to the app, allowing it to gracefully shut down and release any resources it holds before exiting. If the app does not shut down within a certain time frame, it will be forcefully killed with a SIGKILL signal. 
+## 9. Disposability
 
-10. Dev/prod parity
+The app should be designed to **start up and shut down quickly**, allowing for rapid scaling and deployment.
 
-Development, staging, and production environments should be as similar as possible to reduce the chances of bugs and issues that arise from differences between these environments. 
+- Processes should be **disposable** — they can be started or stopped at any time without affecting overall functionality.
+- This enables easier failure recovery — any instance can be replaced without impacting the system.
+- Example: `docker stop ...` sends SIGTERM signal for graceful shutdown. If not shutdown within a timeframe, SIGKILL forcefully terminates. 
 
-This includes using:
-- The same type of backing services (e.g., databases, message queues) in the same version/schema
-- The same configuration management (e.g., environment variables with same keys but different values for each environment)
-- The same deployment processes (e.g., CI/CD pipelines) across all environments. 
+## 10. Dev/Prod Parity
 
-Additionally, the developer of the feature should also take part in the deployment process. This helps to ensure that any issues that arise in production can be easily reproduced and fixed in development or staging and reduce the time and effort required to deploy changes to production. 
+**Development, staging, and production environments should be as similar as possible** to reduce bugs and issues from environment differences.
 
-11. Logs
+This includes:
+- Same backing services (databases, message queues) in the same version/schema
+- Same configuration management (environment variables with same keys but different values per environment)
+- Same deployment processes (CI/CD pipelines) across all environments
+- Feature developers participate in the deployment process to ensure issues can be easily reproduced and fixed 
 
-The app should treat logs as event streams, meaning that logs should be written to a permanent storage, and should not be stored locally. The app itself should not be responsible for managing log files or log rotation. Instead, logs should be sent to a centralized logging system (e.g., ELK Stack, Splunk, Datadog) that can aggregate and analyze logs from multiple instances of the app. This allows for better monitoring and troubleshooting of the app.
+## 11. Logs
 
-12. Admin Processes
+The app should **treat logs as event streams** and write to permanent storage, not local storage.
 
-Admin processes are one-off tasks that are run in the same environment as the app, but are not part of the normal operation of the app.
+- The app should **not** be responsible for managing log files or log rotation.
+- Send logs to a **centralized logging system** (e.g., ELK Stack, Splunk, Datadog).
+- This enables better monitoring and troubleshooting by aggregating and analyzing logs from all app instances.
 
-Examples include:
+## 12. Admin Processes
+
+**Admin processes** are one-off tasks run in the same environment as the app, but not part of normal operation.
+
+**Examples:**
 - Database migrations
 - Data seeding
-- Running a console for debugging purposes 
+- Running a console for debugging
 
-These processes should be run using the same codebase, configuration, and backing services as the app itself to ensure consistency and reduce the chances of issues arising from differences between environments. 
+Run using the **same codebase, configuration, and backing services** as the app to ensure consistency and reduce environment-related issues. 

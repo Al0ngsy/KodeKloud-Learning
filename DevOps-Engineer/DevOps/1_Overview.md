@@ -6,9 +6,12 @@ Technology enables innovation, but strong business ideas drive it.
 
 ## What is DevOps?
 
-DevOps is the practice of development and operations engineers working together throughout the entire development lifecycle. By applying Lean and Agile principles, teams can deliver software rapidly and continuously. DevOps is more than collaboration between Dev and Ops — it is a cultural shift and a different way of working.
+**DevOps** is the practice of development and operations engineers working together throughout the entire development lifecycle. By applying **Lean and Agile principles**, teams can deliver software rapidly and continuously. DevOps is more than collaboration between Dev and Ops — it is a **cultural shift** and a different way of working.
 
-DevOps has three dimensions: culture, methods, and tools. Culture is the most important of these.
+**DevOps has three dimensions:**
+- **Culture** (most important)
+- **Methods**
+- **Tools**
 
 ## Key characteristics
 
